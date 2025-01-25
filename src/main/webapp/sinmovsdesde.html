@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>Banca</h1>
+	<fieldset>
+		<legend>Sin Movimientos desde una fecha</legend><br>
+		<form id="formSinMovimientos">
+		
+			<label for="fecha">Fecha Ini</label>
+			<input type="date" name="fecha1">
+			
+			<input type="submit" value="Consultar">
+			<br><br>
+		</form>
+	</fieldset>
+   <div id="resultadoSinMovimientos"></div>
+   
+<script>
+// Evento para el formulario
+      document.getElementById("formSinMovimientos").addEventListener("submit", function(event) {
+    event.preventDefault();  // Prevenir el envío por defecto del formulario
+    const fecha1 = document.querySelector('input[name="fecha1"]').value;
+
+    fetch('FrontController?op=doSinMovsDesde', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fecha1: fecha1 })
+    })
+    .then(response => response.json())
+    .then(data => {
+        let resultadoHTML = "<table><tr><th>DNI</th><th>Nombre</th><th>Direccion</th><th>Telefono</th><th>Cuentas</th></tr>";
+
+        // Iterar sobre las claves del objeto JSON
+        Object.entries(data).forEach(([dni, cliente]) => {
+            const cuentas = cliente.accounts.map(account => 
+                `ID: ${account.idAccount}, Balance: ${account.balance}, Tipo: ${account.typeAccount}`
+            ).join("<br>");
+            resultadoHTML += `<tr>
+                <td>${dni}</td>
+                <td>${cliente.name}</td>
+                <td>${cliente.address}</td>
+                <td>${cliente.phone}</td>
+                <td>${cuentas}</td>
+            </tr>`;
+        });
+
+        resultadoHTML += "</table>";
+        document.getElementById("resultadoSinMovimientos").innerHTML = resultadoHTML;
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Hubo un error al obtener los movimientos.");
+    });
+});
+    </script>
+    <p align="right"><a href="FrontController?op=toMenu">Regresar</a></p>
+</body>
+</html>

@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<center> 		<legend>Saldo promedio mas alto</legend><br>
+		    <form id="formAvgMas">
+
+	<!-- <form action="FrontController?option=doSaldoAvgMasAlto" method="post">-->
+			Introduce anio:<input type="number " name="anio"/><br/><br/>
+			<input type="submit" value="mostrar"/>
+		</form>
+	</center>
+	
+	<div id="resultadoSaldoMas"></div>
+	
+	<script>
+        // Evento para el formulario
+        document.getElementById("formAvgMas").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevenir el env�o por defecto del formulario
+            // Obtener los valores de las fechas del formulario
+            const anio = document.querySelector('input[name="anio"]').value;
+
+            // Crear el objeto de datos a enviar al servidor
+            const data = {
+                anio: anio,
+            };
+
+           fetch('FrontController?op=doSaldoAvgMasAlto', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'  // Especificamos que estamos enviando JSON
+    },
+    body: JSON.stringify({
+        anio: anio,  // Aseg�rate de que las fechas est�n bien definidas
+       })
+    })
+    .then(response => response.json())  // Parsear la respuesta JSON
+    .then(data => {
+    let resultadoHTML = "<table><tr><th>Dni</th><th>Nombre</th><th>Telefono</th></tr>";
+
+    // Iterar sobre los movimientos recibidos
+    data.forEach(movimiento => {
+        resultadoHTML += `<tr><td>${movimiento.dni}</td><td>${movimiento.name}</td><td>${movimiento.phone}</td></tr>`;
+    });
+    resultadoHTML += "</table>";
+
+    // Mostrar los resultados en el div
+    document.getElementById("resultadoSaldoMas").innerHTML = resultadoHTML;
+    })
+      .catch(error => {
+    console.error("Error:", error);
+    alert("Hubo un error al obtener los movimientos.");
+    });
+   });
+    </script>
+</body>
+</html>

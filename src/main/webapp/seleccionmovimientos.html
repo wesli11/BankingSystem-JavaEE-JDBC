@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>Banca</h1>
+	<fieldset>
+		<legend>Movimientos</legend><br>
+		<!-- <form action="FrontController?op=doMovimiento" method="post"> -->
+		    <form id="formMovimientos">
+		
+			<label for="fecha">Fecha Ini</label>
+			<input type="date" name="fecha1" required>
+			<label for="fecha">Fecha fin</label>
+			<input type="date" name="fecha2" required>
+			<input type="submit" value="Consultar">
+			<br><br>
+		</form>
+	</fieldset>
+	
+<div id="resultadoMovimientos"></div>
+<script>
+        // Evento para el formulario
+        document.getElementById("formMovimientos").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevenir el envío por defecto del formulario
+            // Obtener los valores de las fechas del formulario
+            const fecha1 = document.querySelector('input[name="fecha1"]').value;
+            const fecha2 = document.querySelector('input[name="fecha2"]').value;
+
+            // Validar que las fechas estén llenas
+            if (!fecha1 || !fecha2) {
+                alert("Por favor, complete ambas fechas.");
+                return;
+            }
+
+            // Crear el objeto de datos a enviar al servidor
+            const data = {
+                fecha1: fecha1,
+                fecha2: fecha2
+            };
+
+           fetch('FrontController?op=doMovimiento', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'  // Especificamos que estamos enviando JSON
+    },
+    body: JSON.stringify({
+        fecha1: fecha1,  // Asegúrate de que las fechas están bien definidas
+        fecha2: fecha2
+       })
+    })
+    .then(response => response.json())  // Parsear la respuesta JSON
+    .then(data => {
+    let resultadoHTML = "<table><tr><th>Fecha</th><th>Operacion</th><th>Monto</th></tr>";
+
+    // Iterar sobre los movimientos recibidos
+    data.forEach(movimiento => {
+        resultadoHTML += `<tr><td>${movimiento.dateMovement}</td><td>${movimiento.operation}</td><td>${movimiento.quantity}</td></tr>`;
+    });
+    resultadoHTML += "</table>";
+
+    // Mostrar los resultados en el div
+    document.getElementById("resultadoMovimientos").innerHTML = resultadoHTML;
+    })
+      .catch(error => {
+    console.error("Error:", error);
+    alert("Hubo un error al obtener los movimientos.");
+    });
+   });
+    </script>
+</body>
+</html>
